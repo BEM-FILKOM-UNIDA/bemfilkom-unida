@@ -2,14 +2,27 @@ const VIDEO_SRC =
   'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_131748_f2ca2a28-fed7-44c8-b9a9-bd9acdd5ec31.mp4'
 
 function VideoBackground() {
+  const ref = useRef<HTMLVideoElement>(null)
+  useEffect(() => {
+    // ponytail: browser mobile suka mem-parkir video latar tanpa melanjutkan;
+    // kick ulang play() tiap kejadian pause. Kalau iOS Low Power Mode tetap
+    // menolak autoplay, satu-satunya obat adalah tap untuk play.
+    const v = ref.current
+    if (!v) return
+    const resume = () => void v.play().catch(() => {})
+    v.addEventListener('pause', resume)
+    return () => v.removeEventListener('pause', resume)
+  }, [])
   return (
     <video
-      className="absolute inset-0 z-0 h-full w-full object-cover"
+      ref={ref}
+      className="fixed inset-0 z-0 h-full w-full object-cover"
       src={VIDEO_SRC}
       autoPlay
       loop
       muted
       playsInline
+      preload="auto"
     />
   )
 }
@@ -62,7 +75,7 @@ function Hero() {
 }
 
 import Register from './Register'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 function App() {
   const [page, setPage] = useState<'home' | 'register'>('home')
@@ -79,7 +92,7 @@ function App() {
 
   if (page === 'register') {
     return (
-      <div className="bg-background relative h-dvh overflow-y-auto text-foreground antialiased">
+      <div className="bg-background relative min-h-dvh text-foreground antialiased">
         <VideoBackground />
         <Navbar />
         <Register />
