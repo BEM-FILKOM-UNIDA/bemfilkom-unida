@@ -150,7 +150,7 @@ function Register() {
         <p className="text-sm text-muted-foreground">
           Ada pertanyaan?{' '}
           <a
-            href="https://wa.me/6285711082758"
+              href="https://wa.me/6285771082758"
             target="_blank"
             rel="noreferrer"
             className="font-medium text-foreground underline underline-offset-4 transition-opacity hover:opacity-80"
