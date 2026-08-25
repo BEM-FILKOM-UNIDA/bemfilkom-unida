@@ -49,7 +49,7 @@ function Register() {
       const file = (f.elements.namedItem('sertifikat_ldkm') as HTMLInputElement).files?.[0]
       const sertifikat = file ? await uploadSertifikat(file) : null
       await insertPendaftaran(
-        { nama: d.nama, email: d.email, prodi: d.prodi, github: d.github, linkedin: d.linkedin, wa: d.wa, ttl: d.ttl, divisi: d.divisi },
+        { nama: d.nama, email: d.email, prodi: d.prodi, github: d.github, linkedin: d.linkedin, wa: d.wa, ttl: d.ttl, divisi_1: d.divisi_1, divisi_2: d.divisi_2 },
         sertifikat ?? '',
       )
       setStatus('done')
@@ -110,21 +110,23 @@ function Register() {
             <input name="ttl" type="text" required className={input} placeholder="Bandung, 15 Agustus 2005" />
           </div>
         </div>
-        <fieldset>
-          <legend className={label}>Divisi</legend>
-          {/* ponytail: 2x2 pill grid agar satu layar; jadi list vertikal kalau label makin panjang */}
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
-            {['Peninfo', 'Netkomas', 'PSDM', 'Himpunan'].map((d) => (
-              <label
-                key={d}
-                className="liquid-glass flex cursor-pointer select-none items-center justify-center gap-2 rounded-md px-3 py-2.5 text-base sm:text-sm"
-              >
-                <input type="radio" name="divisi" value={d} required className="accent-white" />
-                {d}
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        {(['1', '2'] as const).map((n) => (
+          <fieldset key={n}>
+            <legend className={label}>Divisi — Pilihan {n}</legend>
+            {/* ponytail: strip scroll horizontal biar form tidak makin panjang ke bawah */}
+            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {['Peninfo', 'Netkomas', 'PSDM', 'Himpunan'].map((d) => (
+                <label
+                  key={d}
+                  className="liquid-glass flex shrink-0 cursor-pointer select-none items-center justify-center gap-2 rounded-md px-4 py-2.5 text-base sm:text-sm"
+                >
+                  <input type="radio" name={`divisi_${n}`} value={d} required className="accent-white" />
+                  {d}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        ))}
         <div>
           <label className={label}>Sertifikat LDKM</label>
           <input
