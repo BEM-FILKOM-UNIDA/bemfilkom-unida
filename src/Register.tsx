@@ -73,7 +73,7 @@ function Register() {
   return (
     <section className="relative z-10 mx-auto w-full max-w-md px-4 py-4 text-center sm:max-w-lg sm:px-6 sm:py-8">
       <h2 className="text-xl font-display font-normal text-foreground mb-4 sm:text-2xl">
-        Pendaftaran BEM FILKOM
+        PENDAFTARAN BEM FILKOM 2026-2027
       </h2>
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
@@ -102,7 +102,7 @@ function Register() {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className={label}>Nomer Whatsapp</label>
+            <label className={label}>Nomor Whatsapp</label>
             <input name="wa" type="tel" required className={input} placeholder="08xxxxxxxxx" />
           </div>
           <div>
@@ -112,7 +112,7 @@ function Register() {
         </div>
         {(['1', '2'] as const).map((n) => (
           <fieldset key={n}>
-            <legend className={label}>Divisi — Pilihan {n}</legend>
+            <legend className={label}>Divisi - Pilihan {n}</legend>
             {/* ponytail: strip scroll horizontal biar form tidak makin panjang ke bawah */}
             <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {['Peninfo', 'Netkomas', 'PSDM', 'Himpunan'].map((d) => (
@@ -157,7 +157,7 @@ function Register() {
             rel="noreferrer"
             className="font-medium text-foreground underline underline-offset-4 transition-opacity hover:opacity-80"
           >
-            Hubungin WhatsApp
+            Hubungi WhatsApp
           </a>
         </p>
       </form>
