@@ -113,12 +113,12 @@ function Register() {
         {(['1', '2'] as const).map((n) => (
           <fieldset key={n}>
             <legend className={label}>Divisi - Pilihan {n}</legend>
-            {/* ponytail: strip scroll horizontal full-tepi layar di mobile + snap biar rapi */}
-            <div className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0">
+            {/* ponytail: grid 2x2 supaya keempat divisi muat satu layar tanpa scroll */}
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {['Peninfo', 'Netkomas', 'PSDM', 'Himpunan'].map((d) => (
                 <label
                   key={d}
-                  className="liquid-glass flex shrink-0 cursor-pointer select-none items-center justify-center gap-2 rounded-md px-3 py-2 text-sm snap-start sm:px-4 sm:py-2.5 sm:text-base"
+                  className="liquid-glass flex cursor-pointer select-none items-center justify-center gap-2 rounded-md px-3 py-2.5 text-base sm:text-sm"
                 >
                   <input type="radio" name={`divisi_${n}`} value={d} required className="accent-white" />
                   {d}
