@@ -4,8 +4,21 @@ import { useState } from 'react'
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
 
+// Supabase Storage keys reject characters outside [A-Za-z0-9._-]; unicode
+// filenames (e.g. "Sertifikat — Nama.png") caused a 400 InvalidKey and the
+// generic "Gagal mengirim" error. Slugify to a safe key instead of only
+// replacing spaces.
+function storagePathFor(name: string): string {
+  const safe = name
+    .normalize('NFKD')
+    .replace(/[^\w.-]+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^[-.]+/, '')
+  return `${Date.now()}-${safe || 'sertifikat'}`
+}
+
 async function uploadSertifikat(file: File): Promise<string> {
-  const path = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`
+  const path = storagePathFor(file.name)
   const res = await fetch(`${SUPABASE_URL}/storage/v1/object/pendaftaran/${path}`, {
     method: 'POST',
     headers: {
