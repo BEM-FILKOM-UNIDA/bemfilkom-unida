@@ -59,7 +59,9 @@ function Hero() {
   return (
     <section className="relative z-10 flex flex-col items-center px-4 pb-24 pt-24 text-center sm:px-6 sm:pb-32 sm:pt-36">
       <h1 className="animate-fade-rise text-foreground font-display max-w-7xl text-4xl font-normal leading-[0.95] tracking-[-1px] sm:text-6xl sm:tracking-[-2.46px] md:text-8xl">
-        Coming Soon — Open Recruitment
+        <span className="block sm:inline">Coming Soon</span>
+        <span className="hidden sm:inline"> — </span>
+        <span className="block sm:inline">Open Recruitment</span>
       </h1>
       <p className="animate-fade-rise-delay text-muted-foreground mt-6 max-w-2xl text-base leading-relaxed sm:mt-8 sm:text-lg">
         BEM FILKOM UNIDA 2026 - 2027
