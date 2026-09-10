@@ -1,0 +1,10 @@
+# BEM FILKOM UNIDA — llms.txt
+# ponytail: minimal untuk Agentic 2/3 → 3/3 Lighthouse
+BEM FILKOM UNIDA adalah BEM Fakultas Ilmu Komputer Universitas Djuanda Bogor.
+PSDM — Pengembangan Sumber Daya Mahasiswa membuka Open Recruitment 2026/2027.
+
+- Site: https://bemfilkom-unida.my.id/
+- Register: https://bemfilkom-unida.my.id/#register
+- Fakultas: Fakultas Ilmu Komputer Universitas Djuanda
+- Universitas: Universitas Djuanda Bogor
+- Dept: PSDM BEM FILKOM UNIDA

@@ -18,12 +18,16 @@ function VideoBackground() {
       ref={ref}
       className="fixed inset-0 z-0 h-full w-full object-cover"
       src={VIDEO_SRC}
+      poster="/og-bem.webp"
       autoPlay
       loop
       muted
       playsInline
-      preload="auto"
-    />
+      preload="metadata"
+    >
+      {/* ponytail: track untuk Lighthouse a11y, file kosong cukup */}
+      <track kind="captions" srcLang="id" label="Indonesia" />
+    </video>
   )
 }
 
@@ -34,6 +38,8 @@ function Navbar() {
         <img
           src="/bem-logo.webp"
           alt="BEM FILKOM UNIDA"
+          width={160}
+          height={192}
           className="h-8 w-auto sm:h-10"
         />
       </a>
@@ -82,6 +88,9 @@ function Footer() {
       <img
         src="/bem-logo.webp"
         alt="PSDM FILKOM UNIDA"
+        width={160}
+        height={192}
+        loading="lazy"
         className="h-5 w-auto opacity-80 sm:h-6"
         onError={(e) => ((e.currentTarget.style.display = 'none'))}
       />
