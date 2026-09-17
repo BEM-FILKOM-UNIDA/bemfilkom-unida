@@ -18,7 +18,6 @@ function VideoBackground() {
       ref={ref}
       className="fixed inset-0 z-0 h-full w-full object-cover bg-[hsl(201_100%_13%)]"
       src={VIDEO_SRC}
-      poster="/og-bem.webp"
       autoPlay
       loop
       muted
