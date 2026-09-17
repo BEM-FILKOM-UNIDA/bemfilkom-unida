@@ -62,7 +62,7 @@ function Hero() {
         <span className="block sm:inline">Open Recruitment</span>
       </h1>
       <p className="animate-fade-rise-delay text-muted-foreground mt-6 max-w-2xl text-base leading-relaxed sm:mt-8 sm:text-lg">
-        Temukan ruang untuk belajar, berkontribusi, dan bekerja bersama.
+       Ruang untuk tumbuh dan berkontribusi bersama.
       </p>
       <p className="animate-fade-rise-delay text-muted-foreground/60 mt-3 max-w-2xl text-xs tracking-wide sm:text-sm">
         BEM Fakultas Ilmu Komputer Universitas Djuanda Bogor
