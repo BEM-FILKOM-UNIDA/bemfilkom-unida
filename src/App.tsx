@@ -116,6 +116,7 @@ function App() {
   if (page === 'register') {
     return (
       <div className="bg-background relative flex min-h-dvh flex-col text-foreground antialiased">
+        <VideoBackground />
         <Navbar />
         <Register />
         <Footer />

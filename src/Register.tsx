@@ -128,7 +128,7 @@ function Register() {
             <legend className={label}>Divisi - Pilihan {n}</legend>
             {/* ponytail: grid 2x2 supaya keempat divisi muat satu layar tanpa scroll */}
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              {['Peninfo', 'Netkomas', 'KABINET EKAKARSA', 'Himpunan'].map((d) => (
+              {['Peninfo', 'Netkomas', 'PSDM', 'Himpunan'].map((d) => (
                 <label
                   key={d}
                   className="liquid-glass flex cursor-pointer select-none items-center justify-center gap-2 rounded-md px-2 py-2 text-center text-base break-words sm:px-3 sm:py-2.5 sm:text-sm"
