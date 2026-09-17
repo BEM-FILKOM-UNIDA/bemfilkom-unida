@@ -48,7 +48,7 @@ async function insertPendaftaran(d: Record<string, string>, sertifikat: string) 
 
 function Register() {
   const input =
-    'liquid-glass w-full rounded-lg px-4 py-3 text-base sm:text-sm'
+    'liquid-glass w-full rounded-lg px-3 py-2.5 text-base sm:text-sm'
   const label = 'block text-left text-sm font-medium text-foreground mb-1.5'
   const [status, setStatus] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
 
@@ -84,11 +84,11 @@ function Register() {
   }
 
   return (
-    <section className="relative z-10 mx-auto w-full max-w-md px-4 py-5 text-center sm:max-w-lg sm:px-6 sm:py-8">
+    <section className="relative z-10 mx-auto w-full max-w-md px-3 py-4 text-center sm:max-w-lg sm:px-6 sm:py-8">
       <h2 className="text-xl font-display font-normal text-foreground mb-4 sm:text-2xl">
         PENDAFTARAN BEM FILKOM 2026-2027
       </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <label className={label}>Nama Lengkap</label>
           <input name="nama" type="text" required className={input} placeholder="Masukkan nama lengkap" />
@@ -103,7 +103,7 @@ function Register() {
             <option value="Ilmu Komputer">Ilmu Komputer</option>
           </select>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
           <div>
             <label className={label}>Github</label>
             <input name="github" type="text" className={input} placeholder="@username" />
@@ -113,7 +113,7 @@ function Register() {
             <input name="linkedin" type="text" className={input} placeholder="/in/username" />
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
           <div>
             <label className={label}>Nomor Whatsapp</label>
             <input name="wa" type="tel" required className={input} placeholder="08xxxxxxxxx" />
@@ -126,11 +126,11 @@ function Register() {
         {(['1', '2'] as const).map((n) => (
           <fieldset key={n}>
             <legend className={label}>Divisi - Pilihan {n}</legend>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {['Peninfo', 'Netkomas', 'PSDM', 'Himpunan'].map((d) => (
                 <label
                   key={d}
-                  className="liquid-glass flex cursor-pointer select-none items-center justify-center gap-2 rounded-lg px-4 py-3 text-center text-base sm:text-sm"
+                  className="liquid-glass flex cursor-pointer select-none items-center justify-center gap-2 rounded-lg px-3 py-2 text-center text-sm sm:text-sm"
                 >
                   <input type="radio" name={`divisi_${n}`} value={d} required className="accent-white" />
                   {d}
@@ -146,7 +146,7 @@ function Register() {
             name="sertifikat_ldkm"
             required
             accept="image/png,image/jpeg,image/webp"
-            className="liquid-glass w-full rounded-lg px-4 py-3 text-base text-muted-foreground sm:text-sm file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-xs file:text-foreground"
+            className="liquid-glass w-full rounded-lg px-3 py-2.5 text-base text-muted-foreground sm:text-sm file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-xs file:text-foreground"
           />
         </div>
         {status === 'error' && (
@@ -157,7 +157,7 @@ function Register() {
         <button
           type="submit"
           disabled={status === 'sending'}
-          className="liquid-glass text-foreground w-full cursor-pointer rounded-lg px-6 py-3.5 text-base font-medium transition-transform not-disabled:hover:scale-[1.03] active:scale-[0.98] disabled:opacity-60 sm:text-sm"
+          className="liquid-glass text-foreground w-full cursor-pointer rounded-lg px-6 py-3 text-base font-medium transition-transform not-disabled:hover:scale-[1.03] active:scale-[0.98] disabled:opacity-60 sm:text-sm"
         >
           {status === 'sending' ? 'Mengirim...' : 'Kirim Pendaftaran'}
         </button>
