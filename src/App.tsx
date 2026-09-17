@@ -56,7 +56,7 @@ function Hero() {
       {/* ponytail: SEO keywords tanpa ubah visual — sr-only untuk crawler & screen reader */}
       <p className="sr-only">
         BEM FILKOM UNIDA — BEM Fakultas Ilmu Komputer Universitas Djuanda, Fakultas Ilmu Komputer
-        Universitas Djuanda Bogor, Universitas Djuanda, PSDM BEM FILKOM UNIDA Pengembangan Sumber Daya Mahasiswa
+        Universitas Djuanda Bogor, Universitas Djuanda, KABINET EKAKARSA BEM FILKOM UNIDA Pengembangan Sumber Daya Mahasiswa
       </p>
       <h1 className="animate-fade-rise text-foreground font-display max-w-7xl text-4xl font-normal leading-[0.95] tracking-[-1px] sm:text-6xl sm:tracking-[-2.46px] md:text-8xl">
         <span className="block sm:inline">Open Recruitment</span>
@@ -87,14 +87,14 @@ function Footer() {
       {/* ponytail: ganti src ke /psdm-logo.webp saat file tersedia — fallback ke bem-logo */}
       <img
         src="/bem-logo.webp"
-        alt="PSDM FILKOM UNIDA"
+        alt="KABINET EKAKARSA FILKOM UNIDA"
         width={160}
         height={192}
         loading="lazy"
         className="h-5 w-auto opacity-80 sm:h-6"
         onError={(e) => ((e.currentTarget.style.display = 'none'))}
       />
-      <span className="font-medium tracking-[0.14em] text-muted-foreground">PSDM FILKOM UNIDA</span>
+      <span className="font-medium tracking-[0.14em] text-muted-foreground">KABINET EKAKARSA</span>
     </footer>
   )
 }
