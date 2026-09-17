@@ -16,7 +16,7 @@ function VideoBackground() {
   return (
     <video
       ref={ref}
-      className="fixed inset-0 z-0 h-full w-full object-cover"
+      className="fixed inset-0 z-0 h-full w-full object-cover bg-[hsl(201_100%_13%)]"
       src={VIDEO_SRC}
       poster="/og-bem.webp"
       autoPlay
@@ -111,6 +111,19 @@ function App() {
 
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
+
+  useEffect(() => {
+    const preloader = document.getElementById('preloader')
+    if (preloader) preloader.classList.add('hidden')
+  }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const preloader = document.getElementById('preloader')
+      if (preloader) preloader.classList.add('hidden')
+    }, 3000)
+    return () => clearTimeout(timer)
   }, [])
 
   if (page === 'register') {
