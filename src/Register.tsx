@@ -131,7 +131,7 @@ function Register() {
               {['Peninfo', 'Netkomas', 'KABINET EKAKARSA', 'Himpunan'].map((d) => (
                 <label
                   key={d}
-                  className="liquid-glass flex cursor-pointer select-none items-center justify-center gap-2 rounded-md px-3 py-2.5 text-base sm:text-sm"
+                  className="liquid-glass flex cursor-pointer select-none items-center justify-center gap-2 rounded-md px-2 py-2 text-center text-base break-words sm:px-3 sm:py-2.5 sm:text-sm"
                 >
                   <input type="radio" name={`divisi_${n}`} value={d} required className="accent-white" />
                   {d}

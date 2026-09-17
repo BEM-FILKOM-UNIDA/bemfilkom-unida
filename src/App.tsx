@@ -82,7 +82,7 @@ import { useEffect, useRef, useState } from 'react'
 
 function Footer() {
   return (
-    <footer className="relative z-10 mt-auto flex flex-wrap items-center justify-center gap-2 px-4 py-6 text-center text-[11px] tracking-[0.18em] text-muted-foreground/70 sm:py-8 sm:text-xs">
+    <footer className="relative z-10 mt-auto flex flex-wrap items-center justify-center gap-1.5 px-4 py-5 text-center text-[10px] tracking-[0.14em] text-muted-foreground/70 sm:gap-2 sm:px-6 sm:py-6 sm:text-[11px]">
       <span>POWERED BY</span>
       {/* ponytail: ganti src ke /psdm-logo.webp saat file tersedia — fallback ke bem-logo */}
       <img
@@ -91,23 +91,24 @@ function Footer() {
         width={160}
         height={192}
         loading="lazy"
-        className="h-5 w-auto opacity-80 sm:h-6"
+        className="h-4 w-auto opacity-80 sm:h-5"
         onError={(e) => ((e.currentTarget.style.display = 'none'))}
       />
-      <span className="font-medium tracking-[0.14em] text-muted-foreground">KABINET EKAKARSA</span>
+      <span className="font-medium tracking-[0.12em] text-muted-foreground">KABINET EKAKARSA</span>
     </footer>
   )
 }
 
 function App() {
-  const [page, setPage] = useState<'home' | 'register'>('home')
+  const [page, setPage] = useState<'home' | 'register'>(
+    typeof window !== 'undefined' && window.location.hash === '#register' ? 'register' : 'home'
+  )
 
   useEffect(() => {
     const handleHashChange = () => {
       setPage(window.location.hash === '#register' ? 'register' : 'home')
     }
 
-    handleHashChange()
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
@@ -115,7 +116,6 @@ function App() {
   if (page === 'register') {
     return (
       <div className="bg-background relative flex min-h-dvh flex-col text-foreground antialiased">
-        <VideoBackground />
         <Navbar />
         <Register />
         <Footer />
