@@ -127,7 +127,7 @@ function Register() {
           <fieldset key={n}>
             <legend className={label}>Divisi - Pilihan {n}</legend>
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              {['Peninfo', 'Netkomas', 'PSDM', 'Himpunan'].map((d) => (
+              {['PENINFO', 'NETKOMAS', 'PSDM', 'HIMPUNAN'].map((d) => (
                 <label
                   key={d}
                   className="liquid-glass flex cursor-pointer select-none items-center justify-center gap-2 rounded-lg px-3 py-2 text-center text-sm sm:text-sm"
