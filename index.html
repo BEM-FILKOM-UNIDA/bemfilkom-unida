@@ -33,14 +33,32 @@
     <meta name="twitter:image" content="https://bemfilkom-unida.my.id/og-bem.webp" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- ponytail: native defer fonts — media=print + onload untuk hilang render-blocking 750ms -->
+    <!-- ponytail: critical CSS inline untuk first paint tanpa flash putih -->
+    <style>
+      :root {
+        --background: 201 100% 13%;
+        --foreground: 0 0% 100%;
+        --muted-foreground: 240 4% 66%;
+        --font-display: 'Instrument Serif', serif;
+        --font-body: 'Inter', sans-serif;
+      }
+      body {
+        margin: 0;
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+        font-family: var(--font-body);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+    </style>
+    <!-- ponytail: preconnect + preload font agar tidak render-blocking -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500&display=swap"
       rel="stylesheet"
-      media="print"
-      onload="this.media='all'"
+      fetchpriority="high"
     />
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500&display=swap" rel="stylesheet" /></noscript>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
