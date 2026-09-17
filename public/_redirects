@@ -1,3 +1,0 @@
-# ponytail: native Cloudflare Pages redirect www → apex, tanpa dep
-https://www.bemfilkom-unida.my.id/* https://bemfilkom-unida.my.id/:splat 301
-http://www.bemfilkom-unida.my.id/* https://bemfilkom-unida.my.id/:splat 301
