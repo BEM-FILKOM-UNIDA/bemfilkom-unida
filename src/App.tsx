@@ -59,7 +59,7 @@ function Hero() {
         Universitas Djuanda Bogor, Universitas Djuanda, KABINET EKAKARSA BEM FILKOM UNIDA Pengembangan Sumber Daya Mahasiswa
       </p>
       <h1 className="animate-fade-rise text-foreground font-display max-w-7xl text-4xl font-normal leading-[0.95] tracking-[-1px] sm:text-6xl sm:tracking-[-2.46px] md:text-8xl">
-        <span className="block sm:inline">Open Recruitment</span>
+        <span className="inline">Open Recruitment</span>
       </h1>
       <p className="animate-fade-rise-delay text-muted-foreground mt-4 max-w-md text-sm leading-relaxed sm:mt-6 sm:max-w-2xl sm:text-base md:text-lg">
         Ruang untuk tumbuh dan berkontribusi bersama.
