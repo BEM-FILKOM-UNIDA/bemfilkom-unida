@@ -3,6 +3,11 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      // ponytail: Tailwind hanya tahu lebar. Ponsel landscape (mis. 667x375)
+      // lolos semua breakpoint sm/md/lg tapi tingginya cuma 375 - padding
+      // vertikal harus ikut mengecil, kalau tidak CTA-nya jatuh di bawah lipatan.
+      // min-width 640 Supaya ponsel portrait (375x667) tetap longgar, bukan ikut rapat.
+      screens: { short: { raw: '(min-width: 640px) and (max-height: 700px)' } },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

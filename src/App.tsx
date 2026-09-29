@@ -1,41 +1,24 @@
-const VIDEO_SRC =
-  'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260314_131748_f2ca2a28-fed7-44c8-b9a9-bd9acdd5ec31.mp4'
+import { useEffect } from 'react'
 
-function VideoBackground() {
-  const ref = useRef<HTMLVideoElement>(null)
-  useEffect(() => {
-    // ponytail: browser mobile suka mem-parkir video latar tanpa melanjutkan;
-    // kick ulang play() tiap kejadian pause. Kalau iOS Low Power Mode tetap
-    // menolak autoplay, satu-satunya obat adalah tap untuk play.
-    const v = ref.current
-    if (!v) return
-    const resume = () => void v.play().catch(() => {})
-    v.addEventListener('pause', resume)
-    return () => v.removeEventListener('pause', resume)
-  }, [])
+import GooglyButton from './GooglyButton'
+import PixelCloud from './PixelCloud'
+
+function SkyBackground() {
   return (
-    <video
-      ref={ref}
-      className="fixed inset-0 z-0 h-full w-full object-cover bg-[hsl(201_100%_13%)]"
-      src={VIDEO_SRC}
-      autoPlay
-      loop
-      muted
-      playsInline
-      preload="metadata"
-    >
-      {/* ponytail: track untuk Lighthouse a11y, file kosong cukup */}
-      <track kind="captions" srcLang="id" label="Indonesia" />
-    </video>
+    <div className="fixed inset-0 z-0" aria-hidden="true">
+      {/* ponytail: skyTop dinaikkan dari #3876ba ke #6ea8dc supaya teks gelap
+          tetap AA di navbar; warna bawah persis seperti aslinya. */}
+      <PixelCloud skyTopColor="#6ea8dc" skyBottomColor="#8cbfe8" />
+    </div>
   )
 }
 
 function Navbar() {
   return (
-    <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:gap-6 sm:px-8 sm:py-6">
+    <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 short:py-2 sm:gap-6 sm:px-8 sm:py-6">
       <a href="#" className="block shrink-0">
         <img
-          src="/bem-logo.webp"
+          src="/bem-bar.webp"
           alt="BEM FILKOM UNIDA"
           width={160}
           height={192}
@@ -51,41 +34,35 @@ function Navbar() {
 
 function Hero() {
   return (
-    <section className="relative z-10 flex flex-col items-center px-4 pb-24 pt-24 text-center sm:px-6 sm:pb-32 sm:pt-36">
+    <section className="relative z-10 flex flex-col items-center px-4 pb-24 pt-24 text-center short:pb-12 short:pt-12 sm:px-6 sm:pb-32 sm:pt-36">
       {/* ponytail: SEO keywords tanpa ubah visual — sr-only untuk crawler & screen reader */}
       <p className="sr-only">
         BEM FILKOM UNIDA — BEM Fakultas Ilmu Komputer Universitas Djuanda, Fakultas Ilmu Komputer
         Universitas Djuanda Bogor, Universitas Djuanda, KABINET EKAKARSA BEM FILKOM UNIDA Pengembangan Sumber Daya Mahasiswa
       </p>
-      <h1 className="animate-fade-rise text-foreground font-display max-w-7xl text-4xl font-normal leading-[0.95] tracking-[-1px] sm:text-6xl sm:tracking-[-2.46px] md:text-8xl">
-        <span className="inline">Open Recruitment</span>
+      <h1 className="animate-fade-rise text-foreground font-display max-w-7xl text-4xl font-normal leading-[0.95] tracking-[-1px] sm:text-6xl sm:tracking-[-2.46px] md:text-7xl lg:text-8xl">
+        <span className="inline">Under development</span>
       </h1>
       <p className="animate-fade-rise-delay text-muted-foreground mt-4 max-w-md text-sm leading-relaxed sm:mt-6 sm:max-w-2xl sm:text-base md:text-lg">
-        Ruang untuk tumbuh dan berkontribusi bersama.
+        When yh diriku bisa bersamanya
       </p>
       <p className="animate-fade-rise-delay text-muted-foreground/60 mt-3 max-w-2xl text-xs tracking-wide sm:text-sm">
         BEM Fakultas Ilmu Komputer Universitas Djuanda Bogor
       </p>
-      <a
-        href="#register"
-        className="liquid-glass animate-fade-rise-delay-2 text-foreground mt-10 cursor-pointer rounded-full px-7 py-2.5 text-sm transition-transform hover:scale-[1.03] active:scale-[0.98] sm:mt-12 sm:px-8 sm:py-3"
-      >
-        Daftar Sekarang
-      </a>
+      <div className="animate-fade-rise-delay-2 mt-10 short:mt-6 sm:mt-12">
+        <GooglyButton />
+      </div>
     </section>
   )
 }
-
-import Register from './Register'
-import { useEffect, useRef, useState } from 'react'
 
 function Footer() {
   return (
     <footer className="relative z-10 mt-auto flex flex-wrap items-center justify-center gap-1.5 px-4 py-5 text-center text-[10px] tracking-[0.14em] text-muted-foreground/70 sm:gap-2 sm:px-6 sm:py-6 sm:text-[11px]">
       <span>POWERED BY</span>
-      {/* ponytail: ganti src ke /psdm-logo.webp saat file tersedia — fallback ke bem-logo */}
+      {/* ponytail: ganti src ke /psdm-logo.webp saat file tersedia */}
       <img
-        src="/bem-logo.webp"
+        src="/bem-bar.webp"
         alt="KABINET EKAKARSA FILKOM UNIDA"
         width={160}
         height={192}
@@ -99,19 +76,6 @@ function Footer() {
 }
 
 function App() {
-  const [page, setPage] = useState<'home' | 'register'>(
-    typeof window !== 'undefined' && window.location.hash === '#register' ? 'register' : 'home'
-  )
-
-  useEffect(() => {
-    const handleHashChange = () => {
-      setPage(window.location.hash === '#register' ? 'register' : 'home')
-    }
-
-    window.addEventListener('hashchange', handleHashChange)
-    return () => window.removeEventListener('hashchange', handleHashChange)
-  }, [])
-
   useEffect(() => {
     const preloader = document.getElementById('preloader')
     if (preloader) preloader.classList.add('hidden')
@@ -125,20 +89,9 @@ function App() {
     return () => clearTimeout(timer)
   }, [])
 
-  if (page === 'register') {
-    return (
-      <div className="bg-background relative flex min-h-dvh flex-col text-foreground antialiased">
-        <VideoBackground />
-        <Navbar />
-        <Register />
-        <Footer />
-      </div>
-    )
-  }
-
   return (
     <div className="bg-background flex min-h-dvh flex-col overflow-hidden text-foreground antialiased">
-      <VideoBackground />
+      <SkyBackground />
       <Navbar />
       <Hero />
       <Footer />
