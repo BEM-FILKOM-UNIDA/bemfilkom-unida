@@ -1,9 +1,0 @@
-# BEM FILKOM UNIDA — llms.txt
-# ponytail: minimal untuk Agentic 2/3 → 3/3 Lighthouse
-BEM FILKOM UNIDA adalah BEM Fakultas Ilmu Komputer Universitas Djuanda Bogor.
-BEM FILKOM UNIDA 2026/2027 sedang dalam pengembangan oleh KABINET EKAKARSA.
-
-- Site: https://bemfilkom-unida.my.id/
-- Fakultas: Fakultas Ilmu Komputer Universitas Djuanda
-- Universitas: Universitas Djuanda Bogor
-- Dept: KABINET EKAKARSA BEM FILKOM UNIDA

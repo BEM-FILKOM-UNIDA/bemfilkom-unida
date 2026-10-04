@@ -1,7 +1,21 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { devtools } from '@tanstack/devtools-vite'
 
-export default defineConfig({
-  plugins: [react()],
-  build: { target: 'esnext' }, // ponytail: native esnext tanpa transpile Baseline — hemat 11KB polyfill
+import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+
+import viteReact from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import { nitro } from 'nitro/vite'
+
+const config = defineConfig({
+  resolve: { tsconfigPaths: true },
+  plugins: [
+    devtools(),
+    nitro({ rollupConfig: { external: [/^@sentry\//] } }),
+    tailwindcss(),
+    tanstackStart({ srcDirectory: '.' }),
+    viteReact(),
+  ],
 })
+
+export default config
