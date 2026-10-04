@@ -75,10 +75,26 @@ One-time setup in **GitHub → Settings → Secrets and variables → Actions �
 | `CLOUDFLARE_API_TOKEN` | Cloudflare API token with *Workers Scripts: Edit* + *Account Settings: Read* for this account |
 | `CLOUDFLARE_ACCOUNT_ID` | `4f6695fda7842bc1cf05ca3702af861f` (same as in `wrangler.jsonc`) |
 
-Day to day: merge to `develop` → CI runs → PR to `main` → merge → CI builds and deploys automatically.
-Never deploy from `develop`; only `main` deploys.
+Day to day: feature branch → PR → `develop` → CI. Nothing deploys from `develop`.
+Only a push to `main` deploys, so the live site stays untouched until the team merges on purpose.
 
 ---
+
+## Branch model
+
+| Branch | Purpose | Deploys? |
+| --- | --- | --- |
+| `develop` | **All day-to-day work.** Every page, component, and fix lands here first | No |
+| `main` | **Production.** Currently the live site | Yes, on push |
+
+Rules while the site is under development:
+
+- Never push to `main` and never merge `develop` into it — `develop` is the integration branch.
+- Feature work still branches off `develop` (`feat/about-page` → PR → `develop`) so six people avoid conflicts.
+- Merging to `main` is a deliberate launch step: it replaces the live site with the new one. Nothing else
+  triggers a deploy.
+- Recommended: protect `main` in GitHub (Settings → Branches) with "require PR + passing checks" so a
+  production deploy can never happen from a stray push.
 
 ## Team workflow
 

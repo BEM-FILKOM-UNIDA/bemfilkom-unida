@@ -187,8 +187,9 @@ bun run generate-routes  # regenerate routeTree.gen.ts manually
 bunx tsc --noEmit        # type check (run before pushing)
 ```
 
-CI runs `bunx tsc --noEmit`, `bun test`, and `bun run build` on every push and pull request; pushing to `main`
-deploys to Cloudflare (`.github/workflows/`).
+CI runs `bunx tsc --noEmit`, `bun test`, and `bun run build` on every push and pull request to `develop`.
+Only a push to `main` deploys to Cloudflare, and the site is under development on `develop` — so the live
+production site stays on `main` until the team merges on purpose. See the branch model in `README.md`.
 
 ### Testing
 

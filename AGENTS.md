@@ -5,6 +5,12 @@ BEM FILKOM UNIDA website — TanStack Start (SSR) + React 19 + TypeScript + Tail
 **Read `docs/ARCHITECTURE.md` before any structural change.** It is the source of truth for folder
 conventions, routing, and runtime behaviour. This file is only the short list of what breaks the build.
 
+## Branches
+
+- `develop` is the working branch — all changes land here, never on `main`.
+- `main` is production (the currently deployed site). Do not push to it, do not merge `develop` into it.
+- Merging to `main` is a deliberate launch step and the only thing that deploys.
+
 ## Ground rules
 
 - **There is no `src/`.** All code lives in the project root: `routes/`, `components/`, `data/`, `hooks/`,
