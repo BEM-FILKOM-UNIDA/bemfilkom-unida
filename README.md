@@ -38,8 +38,9 @@ the bottom-right corner in dev mode only.
 | --- | --- |
 | `bun install` | Install dependencies |
 | `bun run dev` | Dev server with HMR on port 3000 |
-| `bun run build` | Production build → `.output/` |
-| `bun run preview` | Serve the production build locally |
+| `bun run build` | Production build → Cloudflare Worker output in `.output/` |
+| `bun run preview` | Run the built worker locally (`wrangler dev`) |
+| `bun run deploy` | Deploy to Cloudflare Workers (needs Cloudflare credentials) |
 | `bun run generate-routes` | Regenerate `routeTree.gen.ts` (rarely needed — the dev server does it) |
 | `bunx tsc --noEmit` | Type check — **run before every push** |
 
@@ -47,16 +48,34 @@ Use `PORT=8080 bun run dev` if port 3000 is taken. Stop the server with `Ctrl+C`
 
 ---
 
-## Production build
+## Deploy to Cloudflare
+
+The build targets **Cloudflare Workers** (Nitro preset `cloudflare_module`), worker name `bemfilkom-unida`.
+Worker + account id live in `wrangler.jsonc`; Nitro merges that file into the deploy config it writes to
+`.output/server/wrangler.json`.
 
 ```bash
-bun run build                                  # → .output/ (self-contained Node server)
-node .output/server/index.mjs                  # serve it, defaults to :3000
-PORT=8080 node .output/server/index.mjs        # or pick a port
+bun run build            # → .output/ (worker + static assets)
+bun run preview          # run the built worker locally
+bun run deploy           # deploy to Cloudflare (needs wrangler login)
 ```
 
-`.output/` is fully self-contained — copy it to any Node-compatible host (VPS, Render, Railway, Fly.io) and run
-the command above. Presets for Vercel / Netlify / Cloudflare: <https://v3.nitro.build/deploy>.
+**CI/CD (GitHub Actions)**
+
+| Workflow | Trigger | What it does |
+| --- | --- | --- |
+| `.github/workflows/ci.yml` | push/PR to `main` or `develop` | `bun install --frozen-lockfile`, type check, build |
+| `.github/workflows/deploy.yml` | push to `main`, or manual dispatch | same checks, then `wrangler deploy` |
+
+One-time setup in **GitHub → Settings → Secrets and variables → Actions → New repository secret**:
+
+| Secret | Value |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API token with *Workers Scripts: Edit* + *Account Settings: Read* for this account |
+| `CLOUDFLARE_ACCOUNT_ID` | `4f6695fda7842bc1cf05ca3702af861f` (same as in `wrangler.jsonc`) |
+
+Day to day: merge to `develop` → CI runs → PR to `main` → merge → CI builds and deploys automatically.
+Never deploy from `develop`; only `main` deploys.
 
 ---
 

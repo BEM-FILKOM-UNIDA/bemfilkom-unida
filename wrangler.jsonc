@@ -1,0 +1,6 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bemfilkom-unida",
+  "account_id": "4f6695fda7842bc1cf05ca3702af861f",
+  "compatibility_date": "2026-10-04"
+}

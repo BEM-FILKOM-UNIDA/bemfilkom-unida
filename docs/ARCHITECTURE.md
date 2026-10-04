@@ -26,7 +26,7 @@ All application code lives in the **project root** (there is no `src/` directory
 | Styling | [Tailwind CSS](https://tailwindcss.com) | 4.1 | Utility-first CSS, no per-component CSS files |
 | Bundler | [Vite](https://vite.dev) | 8 | Dev server and build |
 | Language | [TypeScript](https://typescriptlang.org) | 6.0 | Strict mode, everything typed |
-| Deployment | [Nitro](https://nitro.build) | 3 (beta) | Server output (`.output/`) |
+| Deployment | [Cloudflare Workers](https://workers.cloudflare.com) via [Wrangler](https://developers.cloudflare.com/workers/wrangler/) 4.147 | Build output deployed as a Worker (`wrangler.jsonc`) |
 
 Code style: **TypeScript strict**, no semicolons at end of line, 2-space indent (TanStack scaffold defaults).
 
@@ -178,15 +178,16 @@ routes change.
 ```bash
 bun install              # install dependencies
 bun run dev              # dev server + HMR → http://localhost:3000
-bun run build            # production build → .output/ (Nitro)
-bun run preview          # serve the production build
+bun run build            # production build → .output/ (Cloudflare Worker + assets)
+bun run preview          # run the built worker locally (wrangler dev)
+bun run deploy           # deploy to Cloudflare Workers
 bun run generate-routes  # regenerate routeTree.gen.ts manually
 
 bunx tsc --noEmit        # type check (run before pushing)
 ```
 
-There is no linter and no automated test yet. Minimum bar before opening a PR: `bunx tsc --noEmit` and
-`bun run build` both pass.
+CI runs the type check and build on every push and pull request; pushing to `main` deploys to Cloudflare
+(`.github/workflows/`). There is no linter and no automated test yet.
 
 ---
 
@@ -194,7 +195,12 @@ There is no linter and no automated test yet. Minimum bar before opening a PR: `
 
 - **TanStack Devtools** (bottom-right corner) only appears in `bun run dev`. No need to guard it with
   `if (import.meta.env.DEV)` — it is handled automatically.
-- **Nitro is still beta** (`3.0.260610-beta`). If deployment misbehaves, suspect this version before blaming code.
+- **The build target is Cloudflare Workers**, set in `vite.config.ts` via the Nitro preset `cloudflare_module`.
+  Worker name, account id, and compatibility date come from `wrangler.jsonc`; Nitro merges them into the deploy
+  config it writes to `.output/server/wrangler.json`. Change the preset only if you also move off Cloudflare —
+  `.output/` is not a Node server and cannot be started with `node`.
+- **Static assets need an `ASSETS` binding.** Nitro wires it automatically; if a CSS/JS/image 404s in the
+  deployed worker, the assets directory in the generated wrangler config is the thing to check.
 - **Server and client share one bundle.** Code that runs on the server (server functions, `process.env` access)
   must never reach the browser. Never put secrets or `.env` values directly in a component — go through a
   server function.
