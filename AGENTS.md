@@ -22,6 +22,7 @@ conventions, routing, and runtime behaviour. This file is only the short list of
 | `tanstackStart({ srcDirectory: '.' })` in `vite.config.ts` | Otherwise: `Could not resolve entry for router entry: router in .../src` |
 | `routesDirectory` / `generatedRouteTree` in `tsr.config.json` | Router generator writes to the wrong path |
 | `#/*` and `@/*` alias → `./*` in **both** `tsconfig.json` and `package.json` | Types and runtime resolution disagree |
+| `preset: 'cloudflare_module'` in the Nitro plugin + `wrangler.jsonc` | Build target is a Cloudflare Worker, not a Node server |
 | Never edit `routeTree.gen.ts` | Generated output; manual edits are lost |
 
 ## Conventions
@@ -33,14 +34,16 @@ conventions, routing, and runtime behaviour. This file is only the short list of
 - New menu entry → add to `data/nav.ts`; navbar and footer both read from it.
 - Styles are Tailwind utility classes in `className`. No new CSS files.
 - Adding a route file: the dev server regenerates the route tree. `bun run generate-routes` if it did not.
+- Tests live next to the code they cover as `*.test.ts` and run on Bun's built-in runner (`bun test`) —
+  no test framework dependency. Test behaviour, not markup.
 
 ## Verify before claiming done
 
 ```bash
-bunx tsc --noEmit && bun run build
+bunx tsc --noEmit && bun test && bun run build
 ```
 
-Both must pass. There is no linter and no test suite in this repo yet.
+All three must pass. There is no linter and no test suite in this repo yet.
 
 ## Stack references (only when needed)
 

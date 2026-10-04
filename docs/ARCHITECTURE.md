@@ -181,13 +181,37 @@ bun run dev              # dev server + HMR → http://localhost:3000
 bun run build            # production build → .output/ (Cloudflare Worker + assets)
 bun run preview          # run the built worker locally (wrangler dev)
 bun run deploy           # deploy to Cloudflare Workers
+bun test                 # unit tests (Bun's built-in runner)
 bun run generate-routes  # regenerate routeTree.gen.ts manually
 
 bunx tsc --noEmit        # type check (run before pushing)
 ```
 
-CI runs the type check and build on every push and pull request; pushing to `main` deploys to Cloudflare
-(`.github/workflows/`). There is no linter and no automated test yet.
+CI runs `bunx tsc --noEmit`, `bun test`, and `bun run build` on every push and pull request; pushing to `main`
+deploys to Cloudflare (`.github/workflows/`).
+
+### Testing
+
+- Runner: **`bun test`** — Bun's built-in runner, no test framework installed. `import { test, expect } from 'bun:test'`.
+- Tests sit next to the code they cover: `data/nav.test.ts` covers `data/nav.ts`. Same folder, same basename, `.test.ts`.
+- Test **behaviour, not markup**: assert on data, pure functions, and invariants (a nav link must point at a
+  route file that exists). Snapshotting JSX is discouraged — it breaks on every copy tweak.
+- CI runs `bun test` and fails the build on red. Run it locally before pushing.
+
+```ts
+// data/nav.test.ts
+import { describe, expect, test } from 'bun:test'
+import { nav } from './nav'
+
+describe('nav', () => {
+  test('targets are unique', () => {
+    expect(new Set(nav.map((link) => link.to)).size).toBe(nav.length)
+  })
+})
+```
+
+- No linter and no component-rendering tests yet. Add `@happy-dom/global-registrator` only when the first real
+  component test is written — plain `bun test` covers pure logic and data without it.
 
 ---
 

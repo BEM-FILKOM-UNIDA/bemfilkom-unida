@@ -43,6 +43,7 @@ the bottom-right corner in dev mode only.
 | `bun run deploy` | Deploy to Cloudflare Workers (needs Cloudflare credentials) |
 | `bun run generate-routes` | Regenerate `routeTree.gen.ts` (rarely needed — the dev server does it) |
 | `bunx tsc --noEmit` | Type check — **run before every push** |
+| `bun test` | Unit tests (Bun's built-in runner, no framework) |
 
 Use `PORT=8080 bun run dev` if port 3000 is taken. Stop the server with `Ctrl+C`.
 
@@ -64,7 +65,7 @@ bun run deploy           # deploy to Cloudflare (needs wrangler login)
 
 | Workflow | Trigger | What it does |
 | --- | --- | --- |
-| `.github/workflows/ci.yml` | push/PR to `main` or `develop` | `bun install --frozen-lockfile`, type check, build |
+| `.github/workflows/ci.yml` | push/PR to `main` or `develop` | `bun install --frozen-lockfile`, type check, `bun test`, build |
 | `.github/workflows/deploy.yml` | push to `main`, or manual dispatch | same checks, then `wrangler deploy` |
 
 One-time setup in **GitHub → Settings → Secrets and variables → Actions → New repository secret**:
@@ -86,8 +87,9 @@ Never deploy from `develop`; only `main` deploys.
    static content in `data/`. One folder per person to avoid conflicts (see `docs/ARCHITECTURE.md`).
 3. **Verify before pushing:**
    ```bash
-   bunx tsc --noEmit && bun run build
+   bunx tsc --noEmit && bun test && bun run build
    ```
+   All three must pass — CI runs the same three, and a red build blocks the deploy.
 4. **Commit & open a PR.**
 
 Conventions that are easy to break:
