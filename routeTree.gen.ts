@@ -12,7 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as DivisionRouteImport } from './routes/division'
+import { Route as EventsRouteImport } from './routes/events'
+import { Route as DivisionSlugRouteImport } from './routes/division/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,9 +30,14 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DivisionRoute = DivisionRouteImport.update({
-  id: '/division',
-  path: '/division',
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DivisionSlugRoute = DivisionSlugRouteImport.update({
+  id: '/division/$slug',
+  path: '/division/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -39,34 +45,38 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-  '/division': typeof DivisionRoute
+  '/events': typeof EventsRoute
+  '/division/$slug': typeof DivisionSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-  '/division': typeof DivisionRoute
+  '/events': typeof EventsRoute
+  '/division/$slug': typeof DivisionSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-  '/division': typeof DivisionRoute
+  '/events': typeof EventsRoute
+  '/division/$slug': typeof DivisionSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/contact' | '/division'
+  fullPaths: '/' | '/about' | '/contact' | '/events' | '/division/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contact' | '/division'
-  id: '__root__' | '/' | '/about' | '/contact' | '/division'
+  to: '/' | '/about' | '/contact' | '/events' | '/division/$slug'
+  id: '__root__' | '/' | '/about' | '/contact' | '/events' | '/division/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
-  DivisionRoute: typeof DivisionRoute
+  EventsRoute: typeof EventsRoute
+  DivisionSlugRoute: typeof DivisionSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -92,11 +102,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/division': {
-      id: '/division'
-      path: '/division'
-      fullPath: '/division'
-      preLoaderRoute: typeof DivisionRouteImport
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/division/$slug': {
+      id: '/division/$slug'
+      path: '/division/$slug'
+      fullPath: '/division/$slug'
+      preLoaderRoute: typeof DivisionSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -106,7 +123,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
-  DivisionRoute: DivisionRoute,
+  EventsRoute: EventsRoute,
+  DivisionSlugRoute: DivisionSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

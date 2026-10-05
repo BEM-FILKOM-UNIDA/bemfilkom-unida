@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { DivisionCards } from '../components/sections/about/DivisionCards'
 import { Intro } from '../components/sections/about/Intro'
 
 export const Route = createFileRoute('/about')({
@@ -6,5 +7,10 @@ export const Route = createFileRoute('/about')({
 })
 
 function About() {
-  return <Intro />
+  return (
+    <>
+      <Intro />
+      <DivisionCards />
+    </>
+  )
 }

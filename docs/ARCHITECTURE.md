@@ -40,7 +40,9 @@ Code style: **TypeScript strict**, no semicolons at end of line, 2-space indent 
 │   ├── __root.tsx             # Global layout: <head>, NavbarHeader, <main>, Footer
 │   ├── index.tsx              # /          Home
 │   ├── about.tsx              # /about     About
-│   ├── division.tsx           # /division  Division
+│   ├── division/
+│   │   └── $slug.tsx          # /division/<slug>  Division detail, no nav entry
+│   ├── events.tsx             # /events    Event
 │   └── contact.tsx            # /contact   Contact
 │
 ├── components/                # Reusable React components
@@ -52,14 +54,18 @@ Code style: **TypeScript strict**, no semicolons at end of line, 2-space indent 
 │       ├── home/              # Sections for routes/index.tsx
 │       │   └── Hero.tsx
 │       ├── about/             # Sections for routes/about.tsx
-│       │   └── Intro.tsx
-│       ├── division/          # Sections for routes/division.tsx
+│       │   ├── Intro.tsx
+│       │   └── DivisionCards.tsx
+│       ├── division/          # Sections for routes/division/$slug.tsx
+│       │   └── Detail.tsx
+│       ├── events/            # Sections for routes/events.tsx
 │       │   └── Intro.tsx
 │       └── contact/           # Sections for routes/contact.tsx
 │           └── Intro.tsx
 │
 ├── data/                      # Content and static data (kept out of components)
-│   └── nav.ts                 # NavItem type + navbar link list
+│   ├── divisions.ts           # The division list behind /division/<slug>
+│   └── nav.ts                 # NavItem type + the four navbar/footer links
 │
 ├── hooks/                     # Custom React hooks shared across pages
 ├── lib/                       # Pure utility functions (date formatting, slugs, etc.)
@@ -119,9 +125,9 @@ function About() {
 ```
 
 Consequences:
-- Adding a section = new file in `routes/`'s page folder + one import line in the route file. Merge conflicts on a
-  page are then limited to the route file's import block.
-- Rename the page folder only if you also rename the route file — folder name always matches the page's URL segment.
+- Adding a section = one new file in the page folder plus one import line in the route file. Merge conflicts on a
+  page stay inside that import block.
+- Folder name always matches the page's URL segment — rename both together.
 - A section two pages both need does not belong in a page folder; move it up into `components/ui/` or
   `components/layout/`.
 
@@ -164,17 +170,43 @@ Files in `routes/` become URLs automatically:
 | --- | --- |
 | `routes/index.tsx` | `/` |
 | `routes/about.tsx` | `/about` |
-| `routes/division.tsx` | `/division` |
+| `routes/events.tsx` | `/events` |
 | `routes/contact.tsx` | `/contact` |
-| `routes/division/programming.tsx` | `/division/programming` |
+| `routes/division/$slug.tsx` | `/division/human-resources` — one file for every division, slug comes from `data/divisions.ts` |
 
 Static segments (no `$`) win over dynamic ones (`$slug`). Always navigate with the `Link` component, **never**
 `<a href>` — a plain anchor forces a full reload and kills client-side navigation.
 
+A route does not have to be in the navbar. `data/nav.ts` holds the four menu entries (`/`, `/about`, `/events`,
+`/contact`); the divisions are reached only from the cards on `/about`. Both navbar and footer read
+`data/nav.ts`, so a page is in the menu in both places or in neither.
+
+### One route, many pages: `$slug`
+
+Adding a division must not mean adding a route file. `/division/<slug>` is a single route; the list lives in
+`data/divisions.ts`:
+
+```ts
+export type Division = { slug: string, name: string, description: string }
+
+export const divisions: Division[] = [
+  { slug: 'human-resources', name: 'Human Resources', description: '...' },
+]
+```
+
+`components/sections/about/DivisionCards.tsx` maps that list to `<Link to="/division/$slug" params={{ slug }} />`;
+`routes/division/$slug.tsx` looks the slug up and renders `components/sections/division/Detail.tsx`. Adding,
+renaming or removing a division is then a `data/divisions.ts` edit — no new file, no `routeTree.gen.ts`
+regeneration. An unknown slug renders the "not found" branch instead of crashing.
+
+Use `$slug` only when the pages are the same shape with different content. A genuinely different layout is its
+own route file.
+
 ### Adding a new page
 
+Create the route file and a section folder named after the page:
+
 ```bash
-# 1. create the route file and its section folder, e.g. /program
 touch routes/program.tsx
 mkdir -p components/sections/program
 ```
@@ -193,9 +225,10 @@ function Program() {
 }
 ```
 
-Then add the link to `data/nav.ts` (`{ to: '/program', label: 'Program' }`) — navbar **and** footer update
-together because both read from that single source. `routeTree.gen.ts` is regenerated automatically by the
-dev server / `bun run generate-routes`.
+If the page belongs in the menu, add `{ to: '/program', label: 'Program' }` to `data/nav.ts` — navbar **and**
+footer update together because both read from that single source. A page reached only from a card on another
+page (`/division`) gets no nav entry. `routeTree.gen.ts` is regenerated automatically by the dev server, or
+manually with `bun run generate-routes`.
 
 ---
 
@@ -236,7 +269,8 @@ production site stays on `main` until the team merges on purpose. See the branch
 ### Testing
 
 - Runner: **`bun test`** — Bun's built-in runner, no test framework installed. `import { test, expect } from 'bun:test'`.
-- Tests sit next to the code they cover: `data/nav.test.ts` covers `data/nav.ts`. Same folder, same basename, `.test.ts`.
+- Tests sit next to the code they cover: `data/nav.test.ts` covers `data/nav.ts`, `data/divisions.test.ts` covers
+  `data/divisions.ts`. Same folder, same basename, `.test.ts`.
 - Test **behaviour, not markup**: assert on data, pure functions, and invariants (a nav link must point at a
   route file that exists). Snapshotting JSX is discouraged — it breaks on every copy tweak.
 - CI runs `bun test` and fails the build on red. Run it locally before pushing.
