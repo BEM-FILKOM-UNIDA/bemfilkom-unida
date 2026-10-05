@@ -99,8 +99,9 @@ Rules while the site is under development:
 ## Team workflow
 
 1. **Branch:** `git checkout -b feat/about-page`
-2. **Build your page** — create the route file in `routes/`, put reusable parts in `components/`,
-   static content in `data/`. One folder per person to avoid conflicts (see `docs/ARCHITECTURE.md`).
+2. **Build your page** — create the route file in `routes/` and put its sections in
+   `components/sections/<page>/` (`components/sections/about/` for `/about`), static content in `data/`. One
+   folder per person to avoid conflicts (see `docs/ARCHITECTURE.md`).
 3. **Verify before pushing:**
    ```bash
    bunx tsc --noEmit && bun test && bun run build
@@ -111,6 +112,8 @@ Rules while the site is under development:
 Conventions that are easy to break:
 
 - `routes/*.tsx` is one file per page and holds only composition — extract anything reused into `components/`.
+- `components/sections/<page>/` holds one page's sections only; a section two pages share belongs in
+  `components/ui/`.
 - Navigate with `<Link>` from `@tanstack/react-router`, never `<a href>`.
 - Add new menu links to `data/nav.ts`; navbar and footer both read from it.
 - Never edit `routeTree.gen.ts` — it is generated.

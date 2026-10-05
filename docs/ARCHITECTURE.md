@@ -48,7 +48,15 @@ Code style: **TypeScript strict**, no semicolons at end of line, 2-space indent 
 │   │   ├── NavbarHeader.tsx   # <NavbarHeader /> + <NavLinks /> (also used by Footer)
 │   │   └── Footer.tsx         # <Footer />
 │   ├── ui/                    # Generic components: Button, Card, Input, Badge
-│   └── sections/              # Page sections (used per page)
+│   └── sections/              # Page sections, one folder per page
+│       ├── home/              # Sections for routes/index.tsx
+│       │   └── Hero.tsx
+│       ├── about/             # Sections for routes/about.tsx
+│       │   └── Intro.tsx
+│       ├── division/          # Sections for routes/division.tsx
+│       │   └── Intro.tsx
+│       └── contact/           # Sections for routes/contact.tsx
+│           └── Intro.tsx
 │
 ├── data/                      # Content and static data (kept out of components)
 │   └── nav.ts                 # NavItem type + navbar link list
@@ -73,13 +81,49 @@ Code style: **TypeScript strict**, no semicolons at end of line, 2-space indent 
 | `routes/` | One file per page, containing **only** composition: `<Hero />`, `<About />` | Long logic/JS, hardcoded data |
 | `components/layout/` | Components that wrap the whole site | Page content |
 | `components/ui/` | Generic components with no BEM context (button, card, input) | Page-specific copy |
-| `components/sections/` | Page sections that deserve their own file | Five-line components used once — inline them in the page |
+| `components/sections/` | Page sections, filed under a folder named after the page (`sections/about/` → `/about`) | Sections used by more than one page — those go straight in `components/` |
 | `data/` | Copy, division list, contacts, member names | Objects used by a single component |
 | `lib/` | Pure functions without React (`slugify`, `formatDate`) | Hooks (those go in `hooks/`) |
 | `public/` | Images, logo, `.txt` files | JS/TS modules |
 
 > **Rule:** if a component or data set is reused by other pages → extract it into `components/` or `data/`.
-> Used by one page only → leave it in that page's file.
+> Used by one page only → it goes in that page's folder under `components/sections/<page>/`.
+
+### One folder per page (team split)
+
+Each page owns a folder so several people can build pages at the same time without touching the same files:
+
+```
+components/sections/about/Intro.tsx      ← one person's work
+components/sections/about/Vision.tsx
+components/sections/about/Structure.tsx
+```
+
+The route file stays pure composition and never grows past a list of section imports:
+
+```tsx
+// routes/about.tsx
+import { Intro } from '../components/sections/about/Intro'
+import { Structure } from '../components/sections/about/Structure'
+import { Vision } from '../components/sections/about/Vision'
+
+function About() {
+  return (
+    <>
+      <Intro />
+      <Vision />
+      <Structure />
+    </>
+  )
+}
+```
+
+Consequences:
+- Adding a section = new file in `routes/`'s page folder + one import line in the route file. Merge conflicts on a
+  page are then limited to the route file's import block.
+- Rename the page folder only if you also rename the route file — folder name always matches the page's URL segment.
+- A section two pages both need does not belong in a page folder; move it up into `components/ui/` or
+  `components/layout/`.
 
 ---
 
@@ -130,24 +174,22 @@ Static segments (no `$`) win over dynamic ones (`$slug`). Always navigate with t
 ### Adding a new page
 
 ```bash
-# 1. create the route file, e.g. /program
+# 1. create the route file and its section folder, e.g. /program
 touch routes/program.tsx
+mkdir -p components/sections/program
 ```
 
 ```tsx
 // routes/program.tsx
 import { createFileRoute } from '@tanstack/react-router'
+import { Intro } from '../components/sections/program/Intro'
 
 export const Route = createFileRoute('/program')({
   component: Program,
 })
 
 function Program() {
-  return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold">Program</h1>
-    </div>
-  )
+  return <Intro />
 }
 ```
 

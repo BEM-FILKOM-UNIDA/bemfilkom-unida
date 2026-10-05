@@ -34,8 +34,10 @@ conventions, routing, and runtime behaviour. This file is only the short list of
 ## Conventions
 
 - One file per page in `routes/`; a page holds only composition (`<Hero />`, `<About />`).
+- Page-specific sections live in `components/sections/<page>/` — one folder per page, folder name matches the URL
+  segment. That is the team's split point: build `sections/about/*` without touching other pages.
 - Anything reused by two or more pages → `components/` (UI), `components/layout/` (frame), `data/` (content),
-  `lib/` (pure functions), `hooks/` (React hooks). Used once → keep it in the page.
+  `lib/` (pure functions), `hooks/` (React hooks).
 - Navigate with `<Link>` from `@tanstack/react-router`, never `<a href>`.
 - New menu entry → add to `data/nav.ts`; navbar and footer both read from it.
 - Styles are Tailwind utility classes in `className`. No new CSS files.
