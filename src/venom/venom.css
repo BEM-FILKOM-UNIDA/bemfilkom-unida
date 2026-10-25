@@ -6,7 +6,8 @@
   width: 200px;
 }
 
-/* The engine draws a full stage around the pill; it must not take layout space. */
+/* The engine draws a full stage around the pill; it must not take layout space.
+   The engine resizes this to cover the viewport; these are the pre-JS / no-WebGL sizes. */
 .venom-host {
   position: absolute;
   left: 50%;

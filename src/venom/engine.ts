@@ -1642,16 +1642,33 @@ function layoutButton() {
     width: `${btn.hw * 2 * VIEW_SCALE}px`, height: `${btn.hh * 2 * VIEW_SCALE}px`,
   });
 }
+// the stage covers the viewport, so the canvas edge is the screen edge and a tendril is never cut off;
+// the host stays centred on the slot (the pill is drawn at its centre), so grow it symmetrically
+function fitHost() {
+  const r = host.getBoundingClientRect();
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  // +48: the slot sits 24px lower until the intro animation settles
+  const w = 2 * Math.max(cx, innerWidth - cx) + 48;
+  const h = 2 * Math.max(cy, innerHeight - cy) + 48;
+  if (Math.abs(host.offsetWidth - w) < 0.5 && Math.abs(host.offsetHeight - h) < 0.5) return false;
+  host.style.width = `${w}px`;
+  host.style.height = `${h}px`;
+  return true;
+}
 function resize() {
+  const grew = fitHost();
   layoutButton();
   const dpr = Math.min(devicePixelRatio || 1, 2) * quality;
-  W = Math.max(1, Math.round(host.clientWidth * dpr));
-  H = Math.max(1, Math.round(host.clientHeight * dpr));
+  const w = Math.max(1, Math.round(host.clientWidth * dpr));
+  const h = Math.max(1, Math.round(host.clientHeight * dpr));
+  if (!grew && w === W && h === H) return;
+  W = w; H = h;
   canvas.width = W; canvas.height = H;
   DPR = W / viewW(); // device pixels per virtual px: the scale-up happens here
   makeGBuffer();
 }
 addEventListener('resize', resize);
+addEventListener('scroll', resize, { passive: true }); // the slot moves with the page
 resize();
 
 let last = performance.now(), acc = 0, frameEma = 1 / 60, slowFor = 0;
