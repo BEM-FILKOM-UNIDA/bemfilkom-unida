@@ -53,7 +53,18 @@ let labelInkW = 0;      // drawn width of the current label, canvas px
 
 const canvas = document.getElementById('stage');
 const hitEl = document.getElementById('venom');
-const local = (e) => { const r = canvas.getBoundingClientRect(); return [(e.clientX - r.left) / VIEW_SCALE, (e.clientY - r.top) / VIEW_SCALE]; };
+const local = (e) => {
+  cur.px = e.clientX; cur.py = e.clientY; // the screen point, so the stage can re-aim after a scroll
+  const r = canvas.getBoundingClientRect(); return [(e.clientX - r.left) / VIEW_SCALE, (e.clientY - r.top) / VIEW_SCALE];
+};
+// the page scrolls under a still pointer: re-aim at the same screen point, or the web stays latched
+// to a stale spot on the pill and never lets go
+function reaim() {
+  if (!cur.present) return;
+  const r = canvas.getBoundingClientRect();
+  cur.x = cur.lx = (cur.px - r.left) / VIEW_SCALE;
+  cur.y = cur.ly = (cur.py - r.top) / VIEW_SCALE;
+}
 
 const strands = [];
 const crawlers = [];
@@ -1289,7 +1300,7 @@ function stepStrand(s, dt, g, present, inside) {
     const sp = i / (NP - 1);
     // thick where it leaves the body; reaching tendrils thin out into the fine wrap filament
     let r = rMean * (s.pin === 'cursor' ? 0.6 : 1 + 0.55 * Math.exp(-sp / 0.08));
-    if ((s.wrap && s.kind === 'reach') || s.kind === 'micro' || s.kind === 'probe') r *= 1 - 0.62 * ease(0.5, 1, sp);
+    if (s.kind === 'reach' || s.kind === 'micro' || s.kind === 'probe') r *= 1 - 0.62 * ease(0.5, 1, sp);
     else r *= 1 + (0.5 + capGrow) * Math.exp(-(1 - sp) / 0.07);
     r *= 1 - nk * Math.exp(-(((sp - s.neckS) / 0.16) ** 2));
     r *= 1 + bead * 0.3 * Math.sin(sp * Math.PI * 2 * beadFreq + s.phase);
@@ -1658,6 +1669,7 @@ function fitHost() {
 function resize() {
   const grew = fitHost();
   layoutButton();
+  reaim();
   const dpr = Math.min(devicePixelRatio || 1, 2) * quality;
   const w = Math.max(1, Math.round(host.clientWidth * dpr));
   const h = Math.max(1, Math.round(host.clientHeight * dpr));
@@ -1708,7 +1720,9 @@ if ('onpointerrawupdate' in window) {
   }, { passive: true });
 }
 document.documentElement.addEventListener('pointerleave', () => { cur.present = false; });
-addEventListener('blur', () => { cur.present = false; });
+addEventListener('blur', () => { cur.present = false; cur.down = false; });
+// a cancelled touch (scroll, pinch) never sends pointerup: without this the web stays latched forever
+addEventListener('pointercancel', () => { cur.present = false; cur.down = false; });
 addEventListener('pointerdown', (e) => {
   cur.down = true; const [x, y] = local(e); cur.x = x; cur.y = y; cur.present = true;
 });
