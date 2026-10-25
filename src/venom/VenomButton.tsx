@@ -5,12 +5,10 @@ import Eye from './Eye'
 import { mountVenom } from './engine'
 import './venom.css'
 
-const LABELS = ['Get in touch', 'Will touch you'] as const
-
 export default function VenomButton() {
   const hostRef = useRef<HTMLDivElement>(null)
   const [clicked, setClicked] = useState(false)
-  const label = LABELS[clicked ? 1 : 0]
+  const label = clicked ? 'Will touch you' : 'Get in touch'
 
   useEffect(() => {
     const host = hostRef.current
@@ -52,9 +50,6 @@ export default function VenomButton() {
             </span>
           </button>
         </MotionConfig>
-        {/* kept for the vendored engine; hidden by CSS */}
-        <button id="tuneToggle" type="button" aria-expanded="false" aria-controls="panel" className="tune-toggle" />
-        <aside id="panel" className="panel" hidden aria-label="Physics tuning" />
       </div>
     </div>
   )

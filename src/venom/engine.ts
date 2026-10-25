@@ -53,8 +53,6 @@ let labelInkW = 0;      // drawn width of the current label, canvas px
 
 const canvas = document.getElementById('stage');
 const hitEl = document.getElementById('venom');
-const panelEl = document.getElementById('panel');
-const tuneToggle = document.getElementById('tuneToggle');
 const local = (e) => { const r = canvas.getBoundingClientRect(); return [(e.clientX - r.left) / VIEW_SCALE, (e.clientY - r.top) / VIEW_SCALE]; };
 
 const strands = [];
@@ -1656,8 +1654,7 @@ function resize() {
 addEventListener('resize', resize);
 resize();
 
-let last = performance.now(), acc = 0, frameEma = 1 / 60, slowFor = 0, fpsShown = 0;
-const fpsEl = { textContent: '' };
+let last = performance.now(), acc = 0, frameEma = 1 / 60, slowFor = 0;
 function frame(now) {
   let dt = (now - last) / 1000; last = now;
   if (dt > 0.1) dt = 0.1;
@@ -1672,17 +1669,13 @@ function frame(now) {
   // adaptive resolution if the GPU struggles
   if (frameEma > 1 / 40 && dt < 0.09 && document.visibilityState === 'visible') slowFor += dt; else slowFor = 0;
   if (slowFor > 2 && quality > 0.8) { quality -= 0.1; slowFor = 0; resize(); } // never drop far enough to look pixelated
-  if ((fpsShown += dt) > 0.5) { fpsShown = 0; fpsEl.textContent = `${Math.round(1 / frameEma)} fps · ${Math.round(quality * 100)}%`; }
   raf = requestAnimationFrame(frame);
 }
 let raf = requestAnimationFrame(frame);
 
 // ───────────────────────────── input ─────────────────────────────
 function insidePill(x, y) { return pillEdge(x, y, geo()).d < 0; }
-// hover state = pointer over the goo itself (the pill, not the button's square corners)
-function setOver(on) { host.classList.toggle('is-over-goo', on); }
 addEventListener('pointermove', (e) => {
-  if (e.target.closest && e.target.closest('.panel, .tune-toggle')) { cur.present = false; setOver(false); return; }
   const now = performance.now(), dts = Math.max(1, now - cur.t) / 1000;
   const [ex, ey] = local(e);
   if (cur.present) { cur.vx = (ex - cur.lx) / dts; cur.vy = (ey - cur.ly) / dts; }
@@ -1690,7 +1683,6 @@ addEventListener('pointermove', (e) => {
   cur.x = cur.lx = ex; cur.y = cur.ly = ey;
   cur.mouse = e.pointerType === 'mouse' || e.pointerType === 'pen';
   cur.present = cur.mouse || cur.down;
-  setOver(insidePill(cur.x, cur.y));
 }, { passive: true });
 // the rendered cursor is drawn by the page, so take the freshest position the browser offers
 if ('onpointerrawupdate' in window) {
@@ -1698,7 +1690,7 @@ if ('onpointerrawupdate' in window) {
     if (cur.present && cur.mouse) { const [x, y] = local(e); cur.x = x; cur.y = y; }
   }, { passive: true });
 }
-document.documentElement.addEventListener('pointerleave', () => { cur.present = false; setOver(false); });
+document.documentElement.addEventListener('pointerleave', () => { cur.present = false; });
 addEventListener('blur', () => { cur.present = false; });
 addEventListener('pointerdown', (e) => {
   cur.down = true; const [x, y] = local(e); cur.x = x; cur.y = y; cur.present = true;
@@ -1720,57 +1712,6 @@ addEventListener('pointerup', (e) => { if (btn.pressTarget) { const [x, y] = loc
 hitEl.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) press(true); });
 hitEl.addEventListener('keyup', (e) => { if (e.key === 'Enter' || e.key === ' ') press(false, btn.cx, btn.cy); });
 hitEl.addEventListener('click', () => { hitEl.dispatchEvent(new CustomEvent('venom:activate', { bubbles: true })); });
-
-// ───────────────────────────── tuning panel ─────────────────────────────
-const SLIDERS = [
-  ['reach', 'Reach', 80, 320, 1],
-  ['maxStrands', 'Tendrils', 1, 7, 1],
-  ['snapStretch', 'Snap stretch', 1.4, 3.6, 0.05],
-  ['maxLen', 'Max length', 160, 520, 1],
-  ['creep', 'Viscous flow', 0, 2, 0.05],
-  ['slither', 'Slither', 0, 2.5, 0.05],
-  ['whip', 'Lunge speed', 0.5, 1.8, 0.05],
-  ['magnet', 'Magnetism', 0, 3, 0.05],
-  ['grip', 'Web grip', 0, 2, 0.05],
-  ['thickness', 'Thickness', 0.5, 1.8, 0.05],
-  ['pull', 'Surface pull', 0, 2, 0.05],
-  ['gravity', 'Gravity', 0, 2400, 10],
-  ['sheen', 'Blue sheen', 0, 1, 0.01],
-];
-const fmt = (v, st) => (st >= 1 ? String(Math.round(v)) : v.toFixed(2));
-panelEl.innerHTML = `<h2>Symbiote physics <span id="fps"></span></h2>` + SLIDERS.map(([k, label, min, max, st]) =>
-  `<label class="row"><span>${label}</span><output id="o-${k}">${fmt(P[k], st)}</output>
-   <input type="range" min="${min}" max="${max}" step="${st}" value="${P[k]}" data-k="${k}"></label>`).join('') +
-  `<div class="actions"><button type="button" id="copyBtn">Copy values</button><button type="button" id="resetBtn">Reset</button></div>`;
-const fpsNode = panelEl.querySelector('#fps');
-Object.defineProperty(fpsEl, 'textContent', { set(v) { if (!panelEl.hidden) fpsNode.textContent = v; } });
-panelEl.addEventListener('input', (e) => {
-  const k = e.target.dataset.k; if (!k) return;
-  const st = SLIDERS.find((s) => s[0] === k)[4];
-  P[k] = Number(e.target.value);
-  panelEl.querySelector(`#o-${k}`).textContent = fmt(P[k], st);
-});
-panelEl.querySelector('#copyBtn').addEventListener('click', async (e) => {
-  try { await navigator.clipboard.writeText(JSON.stringify(P, null, 2)); e.target.textContent = 'Copied'; }
-  catch { e.target.textContent = 'Copy failed'; }
-  setTimeout(() => { e.target.textContent = 'Copy values'; }, 1400);
-});
-panelEl.querySelector('#resetBtn').addEventListener('click', () => {
-  Object.assign(P, DEFAULTS);
-  for (const inp of panelEl.querySelectorAll('input[data-k]')) {
-    inp.value = P[inp.dataset.k];
-    panelEl.querySelector(`#o-${inp.dataset.k}`).textContent = fmt(P[inp.dataset.k], Number(inp.step));
-  }
-});
-function togglePanel(force) {
-  const open = force ?? panelEl.hidden;
-  panelEl.hidden = !open;
-  tuneToggle.setAttribute('aria-expanded', String(open));
-}
-tuneToggle.addEventListener('click', () => togglePanel());
-addEventListener('keydown', (e) => {
-  if ((e.key === 't' || e.key === 'T') && !e.metaKey && !e.ctrlKey && !(e.target instanceof HTMLInputElement)) togglePanel();
-});
 
 // shortcut: only the frame loop is stopped on unmount; the demo's window
 // listeners stay bound (single-page app, component never unmounts in prod).

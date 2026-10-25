@@ -74,12 +74,6 @@
   gap: 6px;
 }
 
-/* engine UI that the page does not need */
-.venom-host .tune-toggle,
-.venom-host .panel {
-  display: none !important;
-}
-
 /* no WebGL2: plain pill, same label */
 .venom-host.no-gl .venom {
   left: 50%;
