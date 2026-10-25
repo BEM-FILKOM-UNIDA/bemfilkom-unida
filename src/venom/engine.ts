@@ -1105,19 +1105,15 @@ function resample(src, a, b) {
   return out;
 }
 
-// pinch-off at the neck: the base whips back into the surface, the tip half recoils into its wrap and unwinds
+// pinch-off at the neck: the base whips back into the surface. With the native cursor there is no hand
+// for the outer half to unwind around, so it is dropped instead of dangling in mid-air.
 function split(s, g) {
   const k = s.neckS * (NP - 1);
   const base = { ...s, kind: 'piece', state: 'recoil', pin: 'anchor', pinch: 0, mound: s.mound, wrap: null,
     pos: resample(s.pos, 0, k), prev: resample(s.prev, 0, k), rad: new Float32Array(NP), vol: s.vol * s.neckS };
-  const tip = { ...s, kind: 'piece', state: 'recoil', pin: 'cursor', pinch: 0, mound: 0,
-    pos: resample(s.pos, NP - 1, k), prev: resample(s.prev, NP - 1, k), rad: new Float32Array(NP), vol: s.vol * (1 - s.neckS) };
   base.len = s.len * s.neckS; base.rest = base.len / (NP - 1);
-  tip.len = s.len * (1 - s.neckS); tip.rest = tip.len / (NP - 1);
-  base.retract = tip.retract = 0;
-  const idx = strands.indexOf(s);
-  strands[idx] = base;
-  if (strands.length < MAXS) strands.push(tip);
+  base.retract = 0;
+  strands[strands.indexOf(s)] = base;
   addRipple(g.cx + s.lx * g.hw, g.cy + s.ly * g.hh, 0.8);
   lastSnap = time;
 }
