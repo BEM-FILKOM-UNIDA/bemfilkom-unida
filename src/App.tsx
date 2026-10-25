@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import GooglyButton from './GooglyButton'
+import VenomButton from './venom/VenomButton'
 import PixelCloud from './PixelCloud'
 
 function SkyBackground() {
@@ -50,7 +50,7 @@ function Hero() {
         BEM Fakultas Ilmu Komputer Universitas Djuanda Bogor
       </p>
       <div className="animate-fade-rise-delay-2 mt-10 short:mt-6 sm:mt-12">
-        <GooglyButton />
+        <VenomButton />
       </div>
     </section>
   )
