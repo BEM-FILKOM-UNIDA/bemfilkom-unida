@@ -53,7 +53,6 @@ let labelInkW = 0;      // drawn width of the current label, canvas px
 
 const canvas = document.getElementById('stage');
 const hitEl = document.getElementById('venom');
-const hintEl = document.getElementById('hint');
 const panelEl = document.getElementById('panel');
 const tuneToggle = document.getElementById('tuneToggle');
 const local = (e) => { const r = canvas.getBoundingClientRect(); return [(e.clientX - r.left) / VIEW_SCALE, (e.clientY - r.top) / VIEW_SCALE]; };
@@ -898,40 +897,6 @@ function uploadLabel() {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 }
 
-function setLabel(svgText) {
-  return new Promise((resolve, reject) => {
-    const doc = new DOMParser().parseFromString(String(svgText).trim(), 'image/svg+xml');
-    const svg = doc.documentElement;
-    if (!svg || svg.nodeName.toLowerCase() !== 'svg' || doc.querySelector('parsererror')) {
-      reject(new Error('That is not a valid SVG.'));
-      return;
-    }
-    const vb = (svg.getAttribute('viewBox') || '').split(/[\s,]+/).map(Number);
-    if (!svg.getAttribute('width') || !svg.getAttribute('height') || /%/.test(svg.getAttribute('width'))) {
-      svg.setAttribute('width', vb.length === 4 && vb[2] ? vb[2] : 400);
-      svg.setAttribute('height', vb.length === 4 && vb[3] ? vb[3] : 100);
-    }
-    const name = (svg.querySelector('title')?.textContent || svg.textContent || '').replace(/\s+/g, ' ').trim();
-    const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' }));
-    const img = new Image();
-    img.onload = () => {
-      const iw = img.naturalWidth || img.width || 400, ih = img.naturalHeight || img.height || 100;
-      const s = Math.min((LABEL_W * 0.94) / iw, (LABEL_PX * 0.78) / ih); // cap-height-ish, like the text label
-      lctx.clearRect(0, 0, LABEL_W, LABEL_H);
-      lctx.drawImage(img, (LABEL_W - iw * s) / 2, (LABEL_H - ih * s) / 2, iw * s, ih * s);
-      URL.revokeObjectURL(url);
-      labelInkW = iw * s;
-      uploadLabel();
-      layoutButton();
-      labelAmt = 0; labelTarget = 1;
-      if (name) { hitEl.setAttribute('aria-label', name); hitEl.textContent = name; }
-      resolve();
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('The SVG could not be rendered.')); };
-    img.src = url;
-  });
-}
-
 async function setLabelText(text) {
   await fontReady;
   lctx.clearRect(0, 0, LABEL_W, LABEL_H);
@@ -943,9 +908,9 @@ async function setLabelText(text) {
   lctx.fillText(text, LABEL_W / 2, LABEL_H / 2 + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2);
   labelInkW = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
   uploadLabel();
-  labelAmt = 0; labelTarget = 1;
-  hitEl.setAttribute('aria-label', text); hitEl.textContent = text;
+  labelAmt = 0; labelTarget = 0; // DOM renders the label; the texture only sizes the pill
   layoutButton();
+  hitEl.style.visibility = 'visible';
 }
 setLabelText(LABEL_TEXT);
 
@@ -1011,11 +976,6 @@ function spawnReach(g) {
   const s = newStrand('reach', g, a.x, a.y);
   s.lat = lat;
   s.vol = Math.PI * 1.25 * 1.25 * 170;
-  // each tendril claims its own wrap site on the hand (index, middle, wrist, ring, thumb, pinky)
-  const taken = new Set(strands.filter((o) => o.wrap).map((o) => o.wrap.f));
-  let f = 0;
-  while (taken.has(f) && f < FINGERS.length - 1) f++;
-  s.wrap = { f, prog: 0, th0: null, dir: 1, ph: rand(0, 6.28), slide: 0, r: 0.7 };
   strands.push(s);
 }
 
@@ -1051,7 +1011,10 @@ function coilPoint(s, f, hair) {
   cp[3] = r * (1 - 0.35 * f * f);
   return cp;
 }
-function coilStart(s) { const p = coilPoint(s, 0, false); return [p[0], p[1], p[2]]; }
+function coilStart(s) {
+  if (!s.wrap) return [cur.x, cur.y, CURZ]; // native cursor: latch straight onto the pointer
+  const p = coilPoint(s, 0, false); return [p[0], p[1], p[2]];
+}
 
 // tiny surface strings: the whole facing surface reacts, sprouting short pointed strands that lean
 // toward the cursor and sway, never latching on
@@ -1432,7 +1395,7 @@ function step(dt) {
   spring(hand, 'coat', 'coatV', inside ? 160 : present ? clamp(45 - e.d, -60, 160) : -60, 9, 0.9, dt);
   const thrT = inside ? 0.57 : 0.8 - 0.2 * clamp(1 - e.d / 60, 0, 1); // ~35% coverage at most
   hand.thr += (thrT - hand.thr) * (1 - Math.exp(-dt * 4));
-  hand.on = hand.ready && cur.present && cur.mouse;
+  hand.on = false; // native cursor only: the goo still tracks cur, but no 3D icon is drawn
   // arrow → hand the instant the goo is about to touch: a lunging tendril past halfway, a latch, or the body
   const touching = inside || strands.some((s) => s.kind === 'reach' && (s.state === 'attached' || (s.state === 'grow' && s.u > 0.5)));
   spring(hand, 'm', 'mV', (engage && touching) || (hand.on && inside) ? 1 : 0, 32, 1.0, dt);
@@ -1673,7 +1636,7 @@ function layoutButton() {
   // the pill hugs the word: its caps begin just past the first and last letters
   const sc = LABEL_CSS / LABEL_PX;
   btn.hh = 30;                                    // 60px tall: more room above and below the word
-  btn.hw = ((labelInkW || 520) * sc) / 2 + 30;    // tighter sides: 30px past the first and last letters
+  btn.hw = ((labelInkW || 520) * sc) / 2 + 38;    // room for the DOM label + eyes
   btn.lbw = (LABEL_W * sc) / 2;
   btn.lbh = (LABEL_H * sc) / 2;
   Object.assign(hitEl.style, {
@@ -1758,27 +1721,6 @@ hitEl.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === '
 hitEl.addEventListener('keyup', (e) => { if (e.key === 'Enter' || e.key === ' ') press(false, btn.cx, btn.cy); });
 hitEl.addEventListener('click', () => { hitEl.dispatchEvent(new CustomEvent('venom:activate', { bubbles: true })); });
 
-// SVG label: drag-drop a file or paste SVG markup (e.g. "Copy as SVG" from Figma)
-function flashHint(msg) {
-  hintEl.innerHTML = msg;
-  hintEl.classList.add('is-flash');
-  clearTimeout(flashHint.t);
-  flashHint.t = setTimeout(() => { hintEl.classList.remove('is-flash'); hintEl.innerHTML = 'Drop or paste an <b>SVG</b> to set the label'; }, 2600);
-}
-addEventListener('dragover', (e) => { e.preventDefault(); });
-addEventListener('drop', async (e) => {
-  e.preventDefault();
-  const f = [...(e.dataTransfer?.files || [])].find((x) => x.type === 'image/svg+xml' || /\.svg$/i.test(x.name));
-  if (!f) { flashHint('Only <b>.svg</b> files work as labels'); return; }
-  try { await setLabel(await f.text()); flashHint(`Label set from <b>${f.name.replace(/[<>&]/g, '')}</b>`); }
-  catch (err) { flashHint(err.message); }
-});
-addEventListener('paste', async (e) => {
-  const t = e.clipboardData?.getData('text/plain') || '';
-  if (!/<svg[\s>]/i.test(t)) return;
-  try { await setLabel(t); flashHint('Label set from pasted <b>SVG</b>'); } catch (err) { flashHint(err.message); }
-});
-
 // ───────────────────────────── tuning panel ─────────────────────────────
 const SLIDERS = [
   ['reach', 'Reach', 80, 320, 1],
@@ -1829,22 +1771,6 @@ tuneToggle.addEventListener('click', () => togglePanel());
 addEventListener('keydown', (e) => {
   if ((e.key === 't' || e.key === 'T') && !e.metaKey && !e.ctrlKey && !(e.target instanceof HTMLInputElement)) togglePanel();
 });
-
-window.VenomButton = { setLabel, params: P, element: hitEl, _debug: {
-  strands, crawlers, hand, cur, btn,
-  // deterministic stepping for automated previews where rAF is throttled
-  advance(sec, x, y) {
-    const n = Math.round(sec / SUB), x0 = cur.x, y0 = cur.y;
-    for (let i = 1; i <= n; i++) {
-      if (x !== undefined) {
-        const nx = x0 + (x - x0) * (i / n), ny = y0 + (y - y0) * (i / n);
-        cur.vx = (nx - cur.x) / SUB; cur.vy = (ny - cur.y) / SUB; cur.x = nx; cur.y = ny; cur.present = true;
-      }
-      step(SUB);
-    }
-    render();
-  },
-} };
 
 // shortcut: only the frame loop is stopped on unmount; the demo's window
 // listeners stay bound (single-page app, component never unmounts in prod).
